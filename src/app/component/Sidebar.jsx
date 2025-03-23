@@ -103,7 +103,7 @@ export const Logo = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="font-medium whitespace-pre text-black dark:text-white">
-        FinAdvisor
+        Acet Labs
       </motion.span>
     </Link>
   );
