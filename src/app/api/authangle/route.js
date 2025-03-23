@@ -1,4 +1,3 @@
-import { SmartConnect } from "smartapi-nodejs";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
