@@ -1,9 +1,9 @@
-"use state"
+"use client"
 import { useState, useEffect } from "react";
-import { Navbar } from "../Components/Nav";
 import { Paperclip, Send, PlusCircle, MessageSquare, Trash2, Edit2 } from "lucide-react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { BackgroundLines } from "@/app/component/ui/BackgroundLines";
 
 const Chatbot = () => {
   const [activeChat, setActiveChat] = useState("default");
@@ -141,7 +141,6 @@ const Chatbot = () => {
 
   return (
     <div className="bg-zinc-950 h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      <Navbar />
       <BackgroundLines className="bg-zinc-950 absolute inset-0" />
 
       <div className="z-20 w-full max-w-6xl h-[80vh] flex relative mt-16">
