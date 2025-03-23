@@ -5,10 +5,11 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { BackgroundLines } from "@/app/component/ui/BackgroundLines";
 
-
 const Chatbot = () => {
   const [activeChat, setActiveChat] = useState("default");
-  const [allChats, setAllChats] = useState([]);
+  const [allChats, setAllChats] = useState({
+    default: [{ text: "Hello! How can I help you today?", sender: "bot" }]
+  });
 
   const [loader, setLoader] = useState(false);
   const [input, setInput] = useState("");
@@ -24,7 +25,8 @@ const Chatbot = () => {
 
 
   async function apicall(userInput) {
-    
+    const response = await axios.post("/api/chatbot", { prompt: userInput });
+    return response.data.data;
   }
 
   
@@ -116,7 +118,11 @@ const Chatbot = () => {
     setFile(null);
 
     const data = await apicall(input);
-
+    const botMessages = [...messages, { text: data, sender: "bot" }];
+    setAllChats(prev => ({
+      ...prev,
+      [activeChat]: botMessages
+    }));
     setAllChats(prev => ({
       ...prev,
       [activeChat]: [...newMessages, { text: data, sender: "bot" }]
