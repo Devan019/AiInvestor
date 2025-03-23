@@ -1,194 +1,183 @@
 "use client";
 
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import * as THREE from "three";
+import HALO from "vanta/dist/vanta.halo.min";
+
 import AngleLogin from "./AngleLogin";
+import { HoverEffect } from "./ui/CardHoverEffect";
 
 export function HomePage() {
-  const [profileData, setProfileData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [vantaEffect, setVantaEffect] = useState(null);
+
+  const vantaContainerRef = useCallback((node) => {
+    if (node !== null && !vantaEffect) {
+      setVantaEffect(
+        HALO({
+          el: node,
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.0,
+          minWidth: 200.0,
+          THREE,
+        })
+      );
+    }
+  }, [vantaEffect]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      console.log(urlParams);
-      const requestToken = urlParams.get("auth_token");
-      console.log(requestToken + " is ")
-
-      if (requestToken) {
-        setLoading(true);
-        try {
-          // Step 1: Exchange request_token for access_token
-          const authResponse = await fetch("/api/auth", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ request_token: requestToken }),
-          });
-
-          const authData = await authResponse.json();
-          console.log("authdata is ", authData)
-
-          if (authData.access_token) {
-            // Step 2: Fetch profile data using access_token
-            const profileResponse = await fetch("/api/profile", {
-              method: "GET",
-              headers: {
-                Authorization: `Bearer ${authData.access_token}`,
-              },
-            });
-
-            const profileData = await profileResponse.json();
-            console.log("data from backend ", profileData)
-            setProfileData(profileData);
-          }
-        } catch (error) {
-          console.error("Error fetching profile:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
+    return () => {
+      if (vantaEffect) vantaEffect.destroy();
     };
-
-    fetchProfile();
-  }, []);
+  }, [vantaEffect]);
 
   return (
-    <>
-      <div
-        className="relative mx-auto my-10 flex max-w-7xl flex-col items-center justify-center">
-        <Navbar />
-        <div className="px-4 py-10 md:py-20">
-          {loading ? (
-            <p>Loading profile data...</p>
-          ) : profileData ? (
-            <div>
-              <h2>Profile Data</h2>
-              <pre>{JSON.stringify(profileData, null, 2)}</pre>
-            </div>
-          ) : (
-            <AngleLogin />
-          )}
-        </div>
-        <div
-          className="absolute inset-y-0 left-0 h-full w-px dark:bg-neutral-800/80">
-          <div
-            className="absolute top-0 h-40 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
-        </div>
-        <div
-          className="absolute inset-y-0 right-0 h-full w-px bg-neutral-200/80 dark:bg-neutral-800/80">
-          <div
-            className="absolute h-40 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
-        </div>
-        <div
-          className="absolute inset-x-0 bottom-0 h-px w-full bg-neutral-200/80 dark:bg-neutral-800/80">
-          <div
-            className="absolute mx-auto h-px w-40 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
-        </div>
-        <div className="px-4 py-10 md:py-20">
-          <h1
-            className="relative z-10 mx-auto max-w-4xl text-center text-2xl font-bold text-slate-700 md:text-4xl lg:text-7xl dark:text-slate-300">
-            {"Launch your website in hours, not days"
-              .split(" ")
-              .map((word, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ opacity: 0, filter: "blur(4px)", y: 10 }}
-                  animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: index * 0.1,
-                    ease: "easeInOut",
-                  }}
-                  className="mr-2 inline-block">
-                  {word}
-                </motion.span>
-              ))}
-          </h1>
-          <motion.p
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              duration: 0.3,
-              delay: 0.8,
-            }}
-            className="relative z-10 mx-auto max-w-xl py-4 text-center text-lg font-normal text-neutral-600 dark:text-neutral-400">
-            With AI, you can launch your website in hours, not days. Try our best
-            in class, state of the art, cutting edge AI tools to get your website
-            up.
-          </motion.p>
-          <motion.div
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              duration: 0.3,
-              delay: 1,
-            }}
-            className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4">
-            <button
-              className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-              Explore Now
-            </button>
-            <button
-              className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
-              Contact Support
-            </button>
-          </motion.div>
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 10,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.3,
-              delay: 1.2,
-            }}
-            className="relative z-10 mt-20 rounded-3xl border border-neutral-200 bg-neutral-100 p-4 shadow-md dark:border-neutral-800 dark:bg-neutral-900">
-            <div
-              className="w-full overflow-hidden rounded-xl border border-gray-300 dark:border-gray-700">
-              <Image
-                src="https://assets.aceternity.com/pro/aceternity-landing.webp"
-                alt="Landing page preview"
-                className="aspect-[16/9] h-auto w-full object-cover"
-                height={1000}
-                width={1000} />
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </>
+    <div className="relative w-full">
+      {/* Fixed Vanta Background */}
+      <div ref={vantaContainerRef} className="fixed inset-0 -z-10 h-screen w-full" />
 
+      {/* Scrollable Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[300vh]">
+        <Navbar />
+        <HeroSection />
+        <ThreeDScroll direction="right" />
+        <ThreeDScroll direction="left" />
+        <Features />
+      </div>
+    </div>
   );
 }
 
+// 🔹 Hero Section
+const HeroSection = () => {
+  return (
+    <div className="relative mt-20 flex flex-col items-center justify-center px-4 py-10 md:py-20 text-center">
+      <h1 className="text-3xl font-bold text-white md:text-6xl">
+        Make Smarter Financial Decisions, Faster
+        <span className="block text-lg md:text-2xl font-normal text-violet-300">
+          AI-Powered Investment & Tax Advisory for a Better Future
+        </span>
+      </h1>
+      <p className="mt-6 text-white md:text-lg">
+        Leverage AI-based insights, real-time stock data, and personalized strategies.
+      </p>
 
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 1 }}
+        className="mt-8 flex flex-wrap items-center justify-center gap-4"
+      >
+        <AngleLogin />
+        <button className="rounded-lg border border-violet-500 px-6 py-3 text-white hover:bg-violet-600">
+          Learn More
+        </button>
+      </motion.div>
+    </div>
+  );
+};
+
+const ThreeDScroll = ({ direction }) => {
+  const { scrollYProgress } = useScroll();
+  const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1.2]);
+  const opacity = useTransform(scrollYProgress, [0.1, 0.9], [0, 1]);
+  const x = useTransform(
+    scrollYProgress,
+    [0, 1],
+    direction === "right" ? ["40vw", "0vw"] : ["-40vw", "0vw"]
+  );
+
+  return (
+    <div className="relative z-10 mt-20 flex w-full items-center justify-center h-[100vh] bg-transparent overflow-hidden">
+      <motion.div
+        style={{ scale, x, opacity }}
+        className="relative flex h-96 min-w-[30rem] items-center justify-center rounded-xl bg-black shadow-lg"
+      >
+        <img
+          src="/dashboard-screenshot.png"
+          alt="Dashboard Screenshot"
+          className="h-full w-full rounded-xl"
+          width={"100%"}
+          // layout="fill"
+          // objectFit="cover"
+        />
+      </motion.div>
+    </div>
+  );
+};
+
+// 🔹 Features Section
+const FeaturesArray = [
+  {
+    title: "AI-Based Investment Insights",
+    description:
+      "Get real-time AI-driven investment advice based on stock trends.",
+      link : "#in"
+  },
+  {
+    title: "Live Stock Data",
+    description:
+      "Track real-time stock prices, P/E ratios, and earnings per share.",
+      link : "#data"
+  },
+  {
+    title: "Automated Portfolio Management",
+    description:
+      "Auto-manage your stock portfolio with AI-powered buy/sell signals.",
+      link : "#pro"
+  },
+  {
+    title: "Angel One",
+    description:
+      "Integrates brokerage APIs (Angel One, Groww, etc.).",
+    link: "#one",
+  },
+  {
+    title: "Deep Stock Analysis",
+    description:
+      "Analyzes portfolios for risk, diversification, and returns.",
+    link: "#analysis",
+  },
+  {
+    title: "Regulatory Compliance",
+    description:
+      "Ensures regulatory compliance (SEBI, RBI)",
+    link: "#compliance",
+  },
+]
+const Features = () => {
+  return (
+    <div className="relative z-10 mt-20 w-full px-4 py-20 bg-transparent">
+      <h2 className="text-4xl font-bold text-white text-center mb-10">Features</h2>
+      <div className="max-w-5xl mx-auto px-8">
+      <HoverEffect items={FeaturesArray} />
+    </div>
+    </div>
+  );
+};
+
+// 🔹 Navbar
 const Navbar = () => {
   return (
-    
-    <nav
-      className="flex w-full items-center justify-between border-t border-b border-neutral-200 px-4 py-4 dark:border-neutral-800">
+    <nav className="flex w-full items-center justify-between bg-transparent px-4 py-4">
       <div className="flex items-center gap-2">
-        <div
-          className="size-7 rounded-full bg-gradient-to-br from-violet-500 to-pink-500" />
-        <h1 className="text-base font-bold md:text-2xl">Aceternity UI</h1>
+        <div className="h-7 w-7 rounded-full bg-gradient-to-br from-violet-500 to-pink-500" />
+        <h1 className="text-lg font-bold text-white md:text-2xl">FinAdvisor</h1>
       </div>
-
-      
+      <div className="flex gap-4">
+        <a href="#features" className="text-white hover:text-violet-300">
+          Features
+        </a>
+        <a href="#pricing" className="text-white hover:text-violet-300">
+          Pricing
+        </a>
+        <a href="#contact" className="text-white hover:text-violet-300">
+          Contact
+        </a>
+      </div>
     </nav>
-    
   );
 };
