@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { BackgroundLines } from "@/app/component/ui/BackgroundLines";
 
+
 const Chatbot = () => {
   const [activeChat, setActiveChat] = useState("default");
   const [allChats, setAllChats] = useState([]);
