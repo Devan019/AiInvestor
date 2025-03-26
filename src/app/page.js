@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { HomePage } from './component/HomePage'
-import { ResponseData } from './component/AiResponse'
 function page() {
   return (
     <>
-      <HomePage />
+      <Suspense fallback={<div>Loading...</div>}>
+        <HomePage />
+      </Suspense>
     </>
   )
 }

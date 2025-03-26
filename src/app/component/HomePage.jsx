@@ -1,53 +1,28 @@
 "use client";
-
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, useScroll, useTransform } from "framer-motion";
 import * as THREE from "three";
-import Link from 'next/link';
 import HALO from "vanta/dist/vanta.halo.min";
 
 import AngleLogin from "./AngleLogin";
 import { HoverEffect } from "./ui/CardHoverEffect";
 
 export function HomePage() {
+  const searchParams = useSearchParams();
 
-  async function fetchUserData(authToken) {
-    try {
-      const response = await fetch("/api/fetchUserData", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          Accept: "application/json",
-          
-        },
-      });
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  }
 
   const [vantaEffect, setVantaEffect] = useState(null);
   const router = useRouter();
+  const token = searchParams.get("auth_token"); 
   useEffect(() => {
-    // Extract the auth_token from the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const authToken = urlParams.get("auth_token");
+    
 
-    if (authToken) {
-      // Store the auth_token in localStorage or state management
-      localStorage.setItem("angelOneAuthToken", authToken);
-      console.log("Auth token found in URL:", authToken);
-      fetchUserData(authToken);
-      // Redirect to the dashboard or another page
-      // router.push("/dashboard");
+    if (token) {
+      localStorage.setItem("token", token);
+      router.push("/dashboard");
     } else {
-      // Handle error case where auth_token is not present
-      console.error("Auth token not found in URL");
-      router.push("/");
+      console.log("Auth token not found");
     }
   }, [router]);
 
@@ -119,11 +94,11 @@ const HeroSection = () => {
       >
         <AngleLogin />
 
-        <Link href="/dashboard">
+        {/* <Link href="/dashboard">
           <button className="rounded-lg border border-violet-500 px-6 py-3 text-white hover:bg-violet-600">
             Go To Dashboard
           </button>
-        </Link>
+        </Link> */}
       </motion.div>
     </div>
   );
@@ -150,8 +125,8 @@ const ThreeDScroll = ({ direction }) => {
           alt="Dashboard Screenshot"
           className="h-full w-full rounded-xl"
           width={"100%"}
-          // layout="fill"
-          // objectFit="cover"
+        // layout="fill"
+        // objectFit="cover"
         />
       </motion.div>
     </div>
